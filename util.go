@@ -1,13 +1,14 @@
 package predis
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/redis/go-redis/v9"
 )
 
 func IsNil(err error) bool {
-	return err == redis.Nil
+	return errors.Is(err, redis.Nil)
 }
 
 func CreateKey(tableName string, cols ...string) string {
