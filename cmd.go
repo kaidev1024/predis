@@ -27,9 +27,8 @@ func SetStructWithExpiration(ctx context.Context, key string, value any, expirat
 	return set(ctx, key, data, expiration)
 }
 
-
-// Get JSON and unmarshal into any struct
-func GetStruct(ctx context.Context, key string, dest any) error {
+// GetStruct retrieves JSON and unmarshals into a pointer type using generics
+func GetStruct[T any](ctx context.Context, key string, dest *T) error {
 	val, err := client.Get(ctx, key).Result()
 	if err != nil {
 		return fmt.Errorf("redis get error: %w", err)
