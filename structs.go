@@ -12,7 +12,7 @@ func SetStruct(ctx context.Context, key string, value any) error {
 	if err != nil {
 		return fmt.Errorf("marshal error: %w", err)
 	}
-	return set(ctx, key, data, defaultExpiration)
+	return set(ctx, key, data, coldDefaultExpiration)
 }
 
 func SetStructWithExpiration(ctx context.Context, key string, value any, expiration time.Duration) error {

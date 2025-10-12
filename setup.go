@@ -7,7 +7,8 @@ import (
 )
 
 var client *redis.Client
-var defaultExpiration time.Duration = 24 * time.Hour
+var coldDefaultExpiration time.Duration = time.Hour
+var hotDefaultExpiration time.Duration = 24 * time.Hour
 
 func setUpClient(addr string) {
 	client = redis.NewClient(&redis.Options{
@@ -21,7 +22,8 @@ func SetUp(addr string) {
 	setUpClient(addr)
 }
 
-func SetUpWithExpiration(addr string, expiration time.Duration) {
-	defaultExpiration = expiration
+func SetUpWithExpiration(addr string, coldExpiration, hotExpiration time.Duration) {
+	coldDefaultExpiration = coldExpiration
+	hotDefaultExpiration = hotExpiration
 	setUpClient(addr)
 }
