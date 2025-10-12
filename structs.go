@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/kaidev1024/pugo/pustruct"
 )
 
 func SetStruct(ctx context.Context, key string, value any) error {
@@ -40,6 +42,10 @@ func HGet(ctx context.Context, key, field string) (string, error) {
 	return client.HGet(ctx, key, field).Result()
 }
 
-func HGetAll(ctx context.Context, key string) (map[string]string, error) {
-	return client.HGetAll(ctx, key).Result()
+func HGetAll[T any](ctx context.Context, key string, target *T) error {
+	data, err := client.HGetAll(ctx, key).Result()
+	if err != nil {
+		return fmt.Errorf("redis hgetall error: %w", err)
+	}
+	return pustruct.UpdateFieldsWithStrings(target, data)
 }
