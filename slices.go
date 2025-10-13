@@ -34,3 +34,7 @@ func LRange[T any](ctx context.Context, key string, start, stop int64) ([]T, err
 	}
 	return items, nil
 }
+
+func LAll[T any](ctx context.Context, key string) ([]T, error) {
+	return LRange[T](ctx, key, 0, -1)
+}
