@@ -34,8 +34,8 @@ func GetStruct[T any](ctx context.Context, key string, dest *T) error {
 	return json.Unmarshal([]byte(val), dest)
 }
 
-func HSet(ctx context.Context, key string, values ...interface{}) (int64, error) {
-	return client.HSet(ctx, key, values...).Result()
+func HSet[T any](ctx context.Context, key string, obj *T) (int64, error) {
+	return client.HSet(ctx, key, pustruct.GetFields(obj)...).Result()
 }
 
 func HGet(ctx context.Context, key, field string) (string, error) {
