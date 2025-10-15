@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kaidev1024/pugo/pustruct"
+	"github.com/redis/go-redis/v9"
 )
 
 func SetStruct(ctx context.Context, key string, value any) error {
@@ -46,6 +47,16 @@ func HGetAll[T any](ctx context.Context, key string, target *T) error {
 	data, err := client.HGetAll(ctx, key).Result()
 	if err != nil {
 		return fmt.Errorf("redis hgetall error: %w", err)
+	}
+	if len(data) == 0 {
+		// Check explicitly if key exists
+		exists, err := client.Exists(ctx, key).Result()
+		if err != nil {
+			return fmt.Errorf("redis exists error: %w", err)
+		}
+		if exists == 0 {
+			return redis.Nil
+		}
 	}
 	return pustruct.UpdateFieldsWithStrings(target, data)
 }
