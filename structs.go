@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gocql/gocql"
 	"github.com/kaidev1024/pugo/pustruct"
 	"github.com/redis/go-redis/v9"
 )
@@ -36,7 +37,14 @@ func GetStruct[T any](ctx context.Context, key string, dest *T) error {
 }
 
 func HSet[T any](ctx context.Context, key string, obj *T) (int64, error) {
-	return client.HSet(ctx, key, pustruct.GetFields(obj)...).Result()
+	fields := pustruct.GetFields(obj)
+	n := len(fields)
+	for i := 1; i < n; i += 2 {
+		if uuidVal, ok := fields[i].(gocql.UUID); ok {
+			fields[i] = uuidVal.String()
+		}
+	}
+	return client.HSet(ctx, key, fields...).Result()
 }
 
 func HGet(ctx context.Context, key, field string) (string, error) {
