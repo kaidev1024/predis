@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/gocql/gocql"
@@ -40,8 +41,20 @@ func HSet[T any](ctx context.Context, key string, obj *T) (int64, error) {
 	fields := pustruct.GetFields(obj)
 	n := len(fields)
 	for i := 1; i < n; i += 2 {
-		if uuidVal, ok := fields[i].(gocql.UUID); ok {
+		val := reflect.ValueOf(fields[i])
+		typ := val.Type()
+			if typ == reflect.TypeOf(gocql.UUID{}) {
+			uuidVal := fields[i].(gocql.UUID)
 			fields[i] = uuidVal.String()
+			continue
+		}
+		// Handle self-defined types (aliases)
+		switch typ.Kind() {
+		case reflect.String:
+			fields[i] = fmt.Sprintf("%v", val.Interface())
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+			reflect.Float32, reflect.Float64, reflect.Bool:
+			fields[i] = fmt.Sprintf("%v", val.Interface())
 		}
 	}
 	return client.HSet(ctx, key, fields...).Result()
