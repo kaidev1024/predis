@@ -52,7 +52,7 @@ func HSet[T any](ctx context.Context, key string, obj *T) (int64, error) {
 		switch typ.Kind() {
 		case reflect.String:
 			fields[i] = fmt.Sprintf("%v", val.Interface())
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 			reflect.Float32, reflect.Float64, reflect.Bool:
 			fields[i] = fmt.Sprintf("%v", val.Interface())
 		}
