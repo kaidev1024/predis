@@ -18,22 +18,23 @@ func RPush[T any](ctx context.Context, key string, items []T) error {
 	return nil
 }
 
-func LRange[T any](ctx context.Context, key string, start, stop int64, dest []*T) error {
+func LRange[T any](ctx context.Context, key string, start, stop int64) ([]*T, error) {
 	vals, err := client.LRange(ctx, key, start, stop).Result()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	for _, v := range vals {
+	result := make([]*T, len(vals))
+	for i, v := range vals {
 		item := new(T)
 		if err := json.Unmarshal([]byte(v), item); err != nil {
-			return err
+			return nil, err
 		}
-		dest = append(dest, item)
+		result[i] = item
 	}
-	return nil
+	return result, nil
 }
 
-func LAll[T any](ctx context.Context, key string, dest []*T) error {
-	return LRange(ctx, key, 0, -1, dest)
+func LAll[T any](ctx context.Context, key string) ([]*T, error) {
+	return LRange[T](ctx, key, 0, -1)
 }
