@@ -43,7 +43,7 @@ func HSet[T any](ctx context.Context, key string, obj *T) (int64, error) {
 	for i := 1; i < n; i += 2 {
 		val := reflect.ValueOf(fields[i])
 		typ := val.Type()
-			if typ == reflect.TypeOf(gocql.UUID{}) {
+		if typ == reflect.TypeOf(gocql.UUID{}) {
 			uuidVal := fields[i].(gocql.UUID)
 			fields[i] = uuidVal.String()
 			continue
@@ -52,7 +52,7 @@ func HSet[T any](ctx context.Context, key string, obj *T) (int64, error) {
 		switch typ.Kind() {
 		case reflect.String:
 			fields[i] = fmt.Sprintf("%v", val.Interface())
-		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 			reflect.Float32, reflect.Float64, reflect.Bool:
 			fields[i] = fmt.Sprintf("%v", val.Interface())
 		}
@@ -70,14 +70,7 @@ func HGetAll[T any](ctx context.Context, key string, target *T) error {
 		return fmt.Errorf("redis hgetall error: %w", err)
 	}
 	if len(data) == 0 {
-		// Check explicitly if key exists
-		exists, err := client.Exists(ctx, key).Result()
-		if err != nil {
-			return fmt.Errorf("redis exists error: %w", err)
-		}
-		if exists == 0 {
-			return redis.Nil
-		}
+		return redis.Nil
 	}
 	return pustruct.UpdateFieldsWithStrings(target, data)
 }

@@ -3,6 +3,9 @@ package predis
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+
+	"github.com/redis/go-redis/v9"
 )
 
 func RPush[T any](ctx context.Context, key string, items []T) error {
@@ -19,13 +22,16 @@ func RPush[T any](ctx context.Context, key string, items []T) error {
 }
 
 func LRange[T any](ctx context.Context, key string, start, stop int64) ([]*T, error) {
-	vals, err := client.LRange(ctx, key, start, stop).Result()
+	data, err := client.LRange(ctx, key, start, stop).Result()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("redis lrange error: %w", err)
 	}
-
-	result := make([]*T, len(vals))
-	for i, v := range vals {
+	n := len(data)
+	if n == 0 {
+		return nil, redis.Nil
+	}
+	result := make([]*T, n)
+	for i, v := range data {
 		item := new(T)
 		if err := json.Unmarshal([]byte(v), item); err != nil {
 			return nil, err
