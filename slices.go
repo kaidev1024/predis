@@ -44,3 +44,26 @@ func LRange[T any](ctx context.Context, key string, start, stop int64) ([]*T, er
 func LAll[T any](ctx context.Context, key string) ([]*T, error) {
 	return LRange[T](ctx, key, 0, -1)
 }
+
+func SetSlice[T any](ctx context.Context, key string, items []T) error {
+	data, err := json.Marshal(items)
+	if err != nil {
+		return fmt.Errorf("marshal error: %w", err)
+	}
+	if err := set(ctx, key, data, coldDefaultExpiration); err != nil {
+		return fmt.Errorf("redis set error: %w", err)
+	}
+	return nil
+}
+
+func GetSlice[T any](ctx context.Context, key string) ([]*T, error) {
+	val, err := get(ctx, key)
+	if err != nil {
+		return nil, fmt.Errorf("redis get error: %w", err)
+	}
+	var items []*T
+	if err := json.Unmarshal([]byte(val), &items); err != nil {
+		return nil, fmt.Errorf("unmarshal error: %w", err)
+	}
+	return items, nil
+}
